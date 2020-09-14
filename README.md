@@ -1,6 +1,6 @@
 # Diego Benítez's Curriculum Vitae
 
-Curriculum Vitae for only my personal purpose. I include the original GitHub readme for reference the original author. Please contact me for contrast my information to my [email](diegoa9218@gmail.com) or GitHub account @xyzdiego, thanks. You can see my CV clicking [**here**](https://github.com/xyzdiego/Hoja_de_vida/blob/master/My_CV_Diego_Benitez.pdf).
+Curriculum Vitae for only my personal purpose. I include the original GitHub readme for reference the original author. Please contact me for contrast my information to my email (diegoa9218@gmail.com) or GitHub account @xyzdiego, thanks. You can see my CV clicking [**here**](https://github.com/xyzdiego/Hoja_de_vida/blob/master/My_CV_Diego_Benitez.pdf).
 
 # Requirements and Compilation
 
