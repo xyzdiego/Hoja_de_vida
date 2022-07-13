@@ -17,12 +17,6 @@ Curriculum Vitae for only my personal purpose. I include the original GitHub rea
 
 For previous versions, please view the next information. 
 
-## AltaCV, yet another LaTeX CV/Résumé class
-
-v1.1.5 (1 December 2018), by LianTze Lim (liantze@gmail.com)
-
-(Thanks to [Nur](https://github.com/nurh) for the name.)
-
 ## Samples
 
-This is how the re-created résumé looks like ([view/open on Overleaf](https://www.overleaf.com/latex/examples/recreating-business-insiders-cv-of-marissa-mayer-using-altacv/gtqfpbwncfvp)). If you're creating your own CV/résumé, you'd probably prefer using the basic template ([view/open on Overleaf](https://www.overleaf.com/latex/templates/altacv-template/trgqjpwnmtgv))
+This is how the re-created résumé looks like view/open on Overleaf. If you're creating your own CV/résumé, you'd probably prefer using the basic template ([view/open on Overleaf](https://es.overleaf.com/latex/templates/phd-cv-template/kbnccdqbydfr))
