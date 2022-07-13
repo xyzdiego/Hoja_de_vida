@@ -1,0 +1,741 @@
+%============================================================================%
+%
+%	DOCUMENT DEFINITION
+%
+%============================================================================%
+
+%we use article class because we want to fully customize the page and don't use a cv template
+\documentclass[10pt,A4]{article}	
+
+
+%----------------------------------------------------------------------------------------
+%	ENCODING
+%----------------------------------------------------------------------------------------
+
+% we use utf8 since we want to build from any machine
+\usepackage[utf8]{inputenc}		
+
+%----------------------------------------------------------------------------------------
+%	LOGIC
+%----------------------------------------------------------------------------------------
+
+% provides \isempty test
+\usepackage{xstring, xifthen}
+
+%----------------------------------------------------------------------------------------
+%	FONT BASICS
+%----------------------------------------------------------------------------------------
+
+% some tex-live fonts - choose your own
+
+%\usepackage[defaultsans]{droidsans}
+%\usepackage[default]{comfortaa}
+%\usepackage{cmbright}
+\usepackage[default]{raleway}
+%\usepackage{fetamont}
+%\usepackage[default]{gillius}
+%\usepackage[light,math]{iwona}
+%\usepackage[thin]{roboto} 
+
+% set font default
+\renewcommand*\familydefault{\sfdefault} 	
+\usepackage[T1]{fontenc}
+
+% more font size definitions
+\usepackage{moresize}
+
+%----------------------------------------------------------------------------------------
+%	FONT AWESOME ICONS
+%---------------------------------------------------------------------------------------- 
+
+% include the fontawesome icon set
+\usepackage{fontawesome}
+
+% use to vertically center content
+% credits to: http://tex.stackexchange.com/questions/7219/how-to-vertically-center-two-images-next-to-each-other
+\newcommand{\vcenteredinclude}[1]{\begingroup
+\setbox0=\hbox{\includegraphics{#1}}%
+\parbox{\wd0}{\box0}\endgroup}
+
+% use to vertically center content
+% credits to: http://tex.stackexchange.com/questions/7219/how-to-vertically-center-two-images-next-to-each-other
+\newcommand*{\vcenteredhbox}[1]{\begingroup
+\setbox0=\hbox{#1}\parbox{\wd0}{\box0}\endgroup}
+
+% icon shortcut
+\newcommand{\icon}[3] { 							
+	\makebox(#2, #2){\textcolor{maincol}{\csname fa#1\endcsname}}
+}	
+
+% icon with text shortcut
+\newcommand{\icontext}[4]{ 						
+	\vcenteredhbox{\icon{#1}{#2}{#3}}  \hspace{2pt}  \parbox{0.9\mpwidth}{\textcolor{#4}{#3}}
+}
+
+% icon with website url
+\newcommand{\iconhref}[5]{ 						
+    \vcenteredhbox{\icon{#1}{#2}{#5}}  \hspace{2pt} \href{#4}{\textcolor{#5}{#3}}
+}
+
+% icon with email link
+\newcommand{\iconemail}[5]{ 						
+    \vcenteredhbox{\icon{#1}{#2}{#5}}  \hspace{2pt} \href{mailto:#4}{\textcolor{#5}{#3}}
+}
+
+%----------------------------------------------------------------------------------------
+%	PAGE LAYOUT  DEFINITIONS
+%----------------------------------------------------------------------------------------
+
+% page outer frames (debug-only)
+% \usepackage{showframe}		
+
+% we use paracol to display breakable two columns
+\usepackage{paracol}
+
+% define page styles using geometry
+\usepackage[a4paper]{geometry}
+
+% remove all possible margins
+\geometry{top=1cm, bottom=1cm, left=1cm, right=1cm}
+
+\usepackage{fancyhdr}
+\pagestyle{empty}
+
+% space between header and content
+% \setlength{\headheight}{0pt}
+
+% indentation is zero
+\setlength{\parindent}{0mm}
+
+%----------------------------------------------------------------------------------------
+%	TABLE /ARRAY DEFINITIONS
+%---------------------------------------------------------------------------------------- 
+
+% extended aligning of tabular cells
+\usepackage{array}
+
+% custom column right-align with fixed width
+% use like p{size} but via x{size}
+\newcolumntype{x}[1]{%
+>{\raggedleft\hspace{0pt}}p{#1}}%
+
+
+%----------------------------------------------------------------------------------------
+%	GRAPHICS DEFINITIONS
+%---------------------------------------------------------------------------------------- 
+
+%for header image
+\usepackage{graphicx}
+
+% use this for floating figures
+% \usepackage{wrapfig}
+% \usepackage{float}
+% \floatstyle{boxed} 
+% \restylefloat{figure}
+
+%for drawing graphics		
+\usepackage{tikz}				
+\usetikzlibrary{shapes, backgrounds,mindmap, trees}
+
+%----------------------------------------------------------------------------------------
+%	Color DEFINITIONS
+%---------------------------------------------------------------------------------------- 
+\usepackage{transparent}
+\usepackage{color}
+
+% primary color
+\definecolor{maincol}{RGB}{ 45, 50, 90 }
+
+% accent color, secondary
+% \definecolor{accentcol}{RGB}{ 250, 150, 10 }
+
+% dark color
+\definecolor{darkcol}{RGB}{ 70, 70, 70 }
+
+% light color
+\definecolor{lightcol}{RGB}{245,245,245}
+
+
+% Package for links, must be the last package used
+\usepackage[hidelinks]{hyperref}
+
+% returns minipage width minus two times \fboxsep
+% to keep padding included in width calculations
+% can also be used for other boxes / environments
+\newcommand{\mpwidth}{\linewidth-\fboxsep-\fboxsep}
+	
+
+
+%============================================================================%
+%
+%	CV COMMANDS
+%
+%============================================================================%
+
+%----------------------------------------------------------------------------------------
+%	 CV LIST
+%----------------------------------------------------------------------------------------
+
+% renders a standard latex list but abstracts away the environment definition (begin/end)
+\newcommand{\cvlist}[1] {
+	\begin{itemize}{#1}\end{itemize}
+}
+
+%----------------------------------------------------------------------------------------
+%	 CV TEXT
+%----------------------------------------------------------------------------------------
+
+% base class to wrap any text based stuff here. Renders like a paragraph.
+% Allows complex commands to be passed, too.
+% param 1: *any
+\newcommand{\cvtext}[1] {
+	\begin{tabular*}{1\mpwidth}{p{0.98\mpwidth}}
+		\parbox{1\mpwidth}{#1}
+	\end{tabular*}
+}
+
+%----------------------------------------------------------------------------------------
+%	CV SECTION
+%----------------------------------------------------------------------------------------
+
+% Renders a a CV section headline with a nice underline in main color.
+% param 1: section title
+\newcommand{\cvsection}[1] {
+	\vspace{14pt}
+	\cvtext{
+		\textbf{\LARGE{\textcolor{darkcol}{\uppercase{#1}}}}\\[-4pt]
+		\textcolor{maincol}{ \rule{0.1\textwidth}{2pt} } \\
+	}
+}
+
+%----------------------------------------------------------------------------------------
+%	META SKILL
+%----------------------------------------------------------------------------------------
+
+% Renders a progress-bar to indicate a certain skill in percent.
+% param 1: name of the skill / tech / etc.
+% param 2: level (for example in years)
+% param 3: percent, values range from 0 to 1
+\newcommand{\cvskill}[3] {
+	\begin{tabular*}{1\mpwidth}{p{0.72\mpwidth}  r}
+ 		\textcolor{black}{\textbf{#1}} & \textcolor{maincol}{#2}\\
+	\end{tabular*}%
+	
+	\hspace{4pt}
+	\begin{tikzpicture}[scale=1,rounded corners=2pt,very thin]
+		\fill [lightcol] (0,0) rectangle (1\mpwidth, 0.15);
+		\fill [maincol] (0,0) rectangle (#3\mpwidth, 0.15);
+  	\end{tikzpicture}%
+}
+
+
+%----------------------------------------------------------------------------------------
+%	 CV EVENT
+%----------------------------------------------------------------------------------------
+
+% Renders a table and a paragraph (cvtext) wrapped in a parbox (to ensure minimum content
+% is glued together when a pagebreak appears).
+% Additional Information can be passed in text or list form (or other environments).
+% the work you did
+% param 1: time-frame i.e. Sep 14 - Jan 15 etc.
+% param 2:	 event name (job position etc.)
+% param 3: Customer, Employer, Industry
+% param 4: Short description
+% param 5: work done (optional)
+% param 6: technologies include (optional)
+% param 7: achievements (optional)
+\newcommand{\cvevent}[7] {
+	
+	% we wrap this part in a parbox, so title and description are not separated on a pagebreak
+	% if you need more control on page breaks, remove the parbox
+	\parbox{\mpwidth}{
+		\begin{tabular*}{1\mpwidth}{p{0.72\mpwidth}  r}
+	 		\textcolor{black}{\textbf{#2}} & \colorbox{maincol}{\makebox[0.25\mpwidth]{\textcolor{white}{#1}}} \\
+			\textcolor{maincol}{\textbf{#3}} & \\
+		\end{tabular*}\\[4pt]
+	
+		\ifthenelse{\isempty{#4}}{}{
+			\cvtext{#4}\\
+		}
+	}
+
+	\ifthenelse{\isempty{#5}}{}{
+		\vspace{4pt}
+		{#5}
+	}
+	\vspace{4pt}
+}
+
+%----------------------------------------------------------------------------------------
+%	 CV META EVENT
+%----------------------------------------------------------------------------------------
+
+% Renders a CV event on the sidebar
+% param 1: title
+% param 2: subtitle (optional)
+% param 3: customer, employer, etc,. (optional)
+% param 4: info text (optional)
+\newcommand{\cvmetaevent}[4] {
+	\textcolor{maincol} {\cvtext{\textbf{\begin{flushleft}#1\end{flushleft}}}}
+
+	\ifthenelse{\isempty{#2}}{}{
+	\textcolor{darkcol} {\cvtext{\textbf{#2}} }
+	}
+
+	\ifthenelse{\isempty{#3}}{}{
+		\cvtext{{ \textcolor{darkcol} {#3} }}\\
+	}
+
+	\cvtext{#4}\\[14pt]
+}
+
+%---------------------------------------------------------------------------------------
+%	QR CODE
+%----------------------------------------------------------------------------------------
+
+% Renders a qrcode image (centered, relative to the parentwidth)
+% param 1: percent width, from 0 to 1
+\newcommand{\cvqrcode}[1] {
+	\begin{center}
+		\includegraphics[width={#1}\mpwidth]{qrcode}
+	\end{center}
+}
+
+%=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+%,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+                       % EDIT AFTER THIS POINT
+%''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+%=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+
+
+%============================================================================%
+%
+%
+%
+%	DOCUMENT CONTENT
+%
+%
+%
+%============================================================================%
+\begin{document}
+\columnratio{0.31}
+\setlength{\columnsep}{2.2em}
+\setlength{\columnseprule}{4pt}
+\colseprulecolor{lightcol}
+\begin{paracol}{2}
+\begin{leftcolumn}
+%---------------------------------------------------------------------------------------
+%	META IMAGE
+%----------------------------------------------------------------------------------------
+%\includegraphics[width=\linewidth]{untitled.jpg}	%trimming relative to image size
+
+
+\vfill\null
+\cvsection{CONTACTO}
+	
+\iconemail{EnvelopeSquare}{14}{diegoa9218@gmail.com}{diegoa9218@gmail.com}{black}\\[6pt]
+\icontext{Github}{14}{\href{https://github.com/xyzdiego}{xyzdiego}}{black}\\[6pt]
+\icontext{Linkedin}{14}{\href{https://www.linkedin.com/in/diego-andres-benitez-duarte-4ab2595a/}{diego-andres-benitez-duarte}}{black}\\[6pt]
+\icontext{Phone}{14}{+57 3196019123}{black}\\[6pt]
+\vfill\null
+%\cvqrcode{0.7}
+
+%---------------------------------------------------------------------------------------
+%	META SKILLS
+%----------------------------------------------------------------------------------------
+\cvsection{SKILLS}
+
+%\cvskill{Skill_Name} {Years of experience} {percentage of bar fill} \\[-2pt]
+
+\cvskill{R programming} {4+ yrs} {0.8} \\[-2pt]
+
+\cvskill{Java} {0+ yrs} {0.4} \\[-2pt]
+
+\cvskill{Python} {2+ yrs} {0.6} \\[-2pt]
+
+\cvskill{C++} {0+ yrs} {0.2} \\[-2pt]
+
+\cvskill{Linux} {1+ yrs} {0.6} \\[-2pt]
+
+\cvskill{Structural Bioinformatics} {1+ yrs} {0.5} \\[-2pt]
+
+\cvskill{Enseñanza} {3+ yrs} {0.7} \\[-2pt]
+
+\cvskill{Trabajo de campo} {5+ yrs} {0.9} \\[-2pt]
+
+%\vfill\null
+%\cvqrcode{0.7}
+
+%---------------------------------------------------------------------------------------
+%	ACHIEVEMENTS
+%----------------------------------------------------------------------------------------
+\newpage
+\cvsection{DISTINCIONES}
+
+\cvmetaevent
+{Efi-Ciencias UNAL}
+{Examen Final de la Facultad de Ciencias de la Universidad Nacional de Colombia}
+{}
+{Tercer Lugar}
+
+%\cvmetaevent
+%{IELTS}
+%{7.0 out of 9 Band}
+%{}
+%{A certificate issued by International Development Program (IDP), Australia to prove English language proficiency for non-native English language speakers.}
+
+%\cvmetaevent
+%{Cloud Computing 101}
+%{94.30\%}
+%{}
+%{A certificate issued by coursera to prove basic understanding of cloud computing.}
+
+%\cvmetaevent
+%{Achievement}
+%{Certificate Detail}
+%{}
+%{Description will go here as a sentence.}
+
+\end{leftcolumn}
+\begin{rightcolumn}
+%---------------------------------------------------------------------------------------
+%	TITLE  HEADER
+%----------------------------------------------------------------------------------------
+\fcolorbox{white}{darkcol}{\begin{minipage}[c][3.5cm][c]{1\mpwidth}
+	\begin {center}
+		\HUGE{ \textbf{ \textcolor{white}{ \uppercase{ DIEGO ANDRES BENITEZ DUARTE } } } } \\[-24pt]
+		\textcolor{white}{ \rule{0.1\textwidth}{1.25pt} } \\[4pt]
+		\large{ \textcolor{white} {Biólogo } }
+	\end {center}
+\end{minipage}} \\[14pt]
+\vspace{-12pt}
+
+%---------------------------------------------------------------------------------------
+%	EDUCATION
+%----------------------------------------------------------------------------------------
+%\vfill\null
+\cvsection{EDUCACIÓN}
+
+\cvevent
+	{\textbf{2018 - 2019}}
+	{Especialista en Estadística Aplicada}
+	{Fundación Universitaria Los Libertadores - Bogotá D.C., Colombia}
+	{Análisis de afectación de coberturas vegetales por incendios forestales en seis zonas de Bogotá por un Modelo Data Panel}
+\vfill\null
+
+\cvevent
+    {\textbf{2010 - 2016}}
+    {Biólogo}
+    {Universidad Nacional de Colombia - Sede Bogotá.}
+    {Anatomía Floral del Género \emph{Aetanthus} (Eichler) Engl. (Loranthaceae)}
+\vfill\null
+
+\cvevent
+    {\textbf{Complementaria}}
+    {Formación complementaria}
+    {Cursos y Diplomados}
+    {Dando click \textbf{\href{https://github.com/xyzdiego/Hoja_de_vida/tree/master/Certificados}{aquí}} podrá ver todos los certificados de formación complementaria.}
+\vfill\null
+
+%---------------------------------------------------------------------------------------
+%	WORK EXPERIENCE
+%----------------------------------------------------------------------------------------
+\vfill\null
+\cvsection{EXPERIENCIA LABORAL}
+
+\cvevent
+	{\textbf{Ene 2020 - Jul 2022}}
+	{Analista de datos}
+	{Laguna Negra Media}
+	{Editor y revisor de fuentes de los artículos publicados en Laguna Negra antes de su fecha de publicación. \\
+	Analista de datos de tráfico de visitantes del sitio web, así como contraste de métricas relacionadas a proyección y desglose estadístico de los visitantes al sitio. \\
+	Soporte estadístico y documental en la construcción de artículos que requieran fuentes secundarias para su elaboración.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Jun 2022}}
+	{Biólogo}
+	{Servicios Geológicos Integrados S.A.S.}
+	{Biólogo encargado de la elaboración de inventario de especies epifitas vasculares, no vasculares y en veda asociadas, así como de suministrar los insumos para la geodatabase en el marco del Estudio de Impacto Ambiental para el proyecto de explotación de hidrocarburos Platero, en Puerto Wilches, Santander.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Feb 2022}}
+	{Biólogo}
+	{APPlus}
+	{Biólogo encargado de la elaboración de inventario de especies epifitas vasculares, no vasculares y en veda asociadas, así como de suministrar los insumos para la geodatabase en el marco de la elaboración del Informe de Cumplimiento Ambiental (ICA) para el proyecto de construcción de un parque fotovoltaico en La Loma, César.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Dic 2021}}
+	{Profesional Constructor y Validador de Items}
+	{Universidad Francisco de Paula Santander}
+	{Construcción de 24 preguntas de pruebas básicas, funcionales y comportamentales en Manejo Integrado de Fauna, Planes ambientales y Ecología, así como la validación de ítems en categorías asistencial, profesional y asesor.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Nov - Dic 2021}}
+	{Biólogo}
+	{Servicios Geológicos Integrados S.A.S.}
+	{Biólogo encargado de la elaboración de inventario de especies epifitas vasculares, no vasculares y en veda asociadas, así como de suministrar los insumos para la geodatabase en el marco del Estudio de Impacto Ambiental para el proyecto de explotación de hidrocarburos en el campo de exploración y explotación petrolera Quifa, en Puerto Gaitan, Meta.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Ago - Oct 2021}}
+	{Biólogo}
+	{Servicios Geológicos Integrados S.A.S.}
+	{Biólogo encargado de la elaboración de inventario de especies epifitas vasculares, no vasculares y en veda asociadas, así como de suministrar los insumos para la geodatabase en el marco del Estudio de Impacto Ambiental para el proyecto de explotación de hidrocarburos en el campo de exploración y explotación petrolera Quifa, en Puerto Gaitan, Meta.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Abr - Jul 2021}}
+	{Biólogo}
+	{Unión Eléctrica S.A.}
+	{Biólogo encargado del seguimiento documental y en campo en la elaboración de inventario, rescate, traslado y monitoreo de especies epifitas vasculares y en veda asociadas en el marco del proyecto Linea de Transmisión Eléctrica 230 kV La Reforma - San Fernando. \\
+    Biólogo encargado del seguimiento documental y de campo en los ahuyentamientos de fauna en el área de influencia del proyecto, así como el seguimiento de la instalación de desviadores de vuelo para prevención de colisión de avifauna en el marco del proyecto. \\
+    Elaboración del Informe de Cumplimiento Ambiental ICA en lo correspondiente a los ítems de flora y  fauna.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Dic 2020-Ene 2021}}
+	{Experto constructor de items}
+	{Universidad Libre de Colombia}
+	{Constructor de ítems de pruebas funcionales y comportamentales para la categoría profesional en las áreas de biología marina, biología molecular y microbiología.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Mar 2020}}
+	{Biólogo}
+	{Araujo-Ibarra Consultores}
+	{Biólogo de campo encargado de la colecta de especies epifitas y en veda asociadas dentro del Proyecto Vial Doble Calzada Rumichaca-Pasto, así como de la toma y suministro de información de insumos para la elaboración de una geodatabase.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Ago - Dic 2019}}
+	{Contratista - Profesional de apoyo}
+	{Facultad de Ciencias Económicas, Universidad Nacional de Colombia}
+	{Profesional encargado del soporte y revisión documentos de contenidos para subir y alojar en la plataforma Moodle.\\
+	Actualización y generación de reportes de uso de la plataforma segmentado por participantes y tiempos de uso.}
+	{}
+\vfill\null
+\cvevent
+	{\textbf{Dic 2019}}
+	{Biólogo}
+	{Araujo-Ibarra Consultores}
+	{Biólogo de campo encargado de la colecta de especies epifitas y en veda asociadas dentro del Proyecto Vial Doble Calzada Rumichaca-Pasto, así como de la toma y suministro de información de insumos para la elaboración de una geodatabase.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Oct 2019}}
+	{Biólogo}
+	{Araujo-Ibarra Consultores}
+	{Biólogo de campo encargado de la colecta de especies epifitas y en veda asociadas dentro del Proyecto Vial Doble Calzada Rumichaca-Pasto \\ Análisis de la información obtenida en campo y elaboración del informe para levantamiento de veda de octubre de 2019}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Jun - Jul 2019}}
+	{Profesional Constructor de Items}
+	{Universidad Francisco de Paula Santander}
+	{Construcción de 27 preguntas de pruebas básicas, funcionales y comportamentales, de nivel profesional, para componentes en Biología y Química.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{May - Jul 2019}}
+	{Biólogo}
+	{Prodiversa S.A.S.}
+	{Biólogo de campo encargado de la colecta y elaboración de inventario de especies epífitas y en veda asociadas dentro del Proyecto Acueducto Interveredal La Calera.\\
+	Análisis de la información obtenida en campo y elaboración del informe levantamiento de veda}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Nov - Dic 2018}}
+	{Biólogo}
+	{JAMCOL S.A.S.}
+	{Biólogo de campo encargado del monitoreo de especies epifitas trasladadas y reubicadas dentro del Proyecto Vial Perimetral Oriente de Bogotá, así como del análisis de la información obtenida en el monitoreo y elaboración del informe de mantenimiento de epifitas, acorde a supervivencia, estado fitosanitario y medidas correctivas tomadas.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Ago - Nov 2018}}
+	{Profesional de Proyectos I}
+	{INERCO Consultora Colombiana}
+	{Biólogo de campo encargado de la colecta y trabajo en la elaboración de inventarios de especies epífitas vasculares, no vasculares y especies en veda asociadas, así como sus registros fotográficos y geoespaciales, dentro del Proyecto Vial Ruta Mar2, en los municipios de Cañasgordas, Uramita y Dabeiba, Antioquía.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Jul - Ago 2018}}
+	{Profesional de soporte}
+	{INERCO Consultora Colombiana}
+	{Biólogo de campo encargado de la colecta y trabajo en la elaboración de inventarios de especies epífitas vasculares y no vasculares y especies en veda asociadas, así como sus registros fotográficos y geoespaciales, dentro del Proyecto Sendero Ruta de la Mariposa en Bogotá.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Mar - Abr 2018}}
+	{Biólogo}
+	{JAMCOL S.A.S.}
+	{Biólogo de campo encargado del monitoreo de especies epifitas trasladadas y reubicadas dentro del Proyecto Vial Perimetral Oriente de Bogotá, así como del análisis de la información obtenida en el monitoreo y elaboración del informe de mantenimiento de epifitas, acorde a supervivencia, estado fitosanitario y medidas correctivas tomadas.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Jul - Dic 2017}}
+	{Analista Forestal}
+	{GTA Ingeniería S.A.S.}
+	{Biólogo profesional encargado de la verificación, caracterización y rescate de especies vegetales epifitas vasculares y en veda terrestres dentro del proyecto Linea de Transmisión 230kV MONUR.\\
+	Realización de inventarios de epifitas vasculares entre Montería, Córdoba, San Pedro de Urabá y Turbo, Antioquía, a lo largo del área de influencia del proyecto.\\
+	Registro fotográfico y de georreferenciación de las especies epifitas vasculares y en veda a lo largo del proyecto, así como determinación del rescate de las mismas.\\
+	Elaboración de la base de datos de seguimiento de epifitas vasculares, junto con los autorreportes de porcentaje y rendimiento de rescate.}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{Feb 2016 - Jul 2017}}
+	{Investigador Asociado}
+	{Corporación CorpoGen}
+	{Biólogo investigador, participante en el proyecto de  desarrollo de una enzima por tecnología recombinante con potencial de degradación de adhesivos quirúrgicos.\\
+	Seguimiento bioinformático y bioestadístico en el proceso de selección de mutaciones puntuales para la evaluación fisicoquímica de la enzima recombinante.\\
+	Evaluación estructural por métodos bioinformáticos de las propiedades fisicoquímicas y de estructura de la proteína recombinante.\\
+	Evalución bioinformática de los patrones de expresión y solubilidad de la proteína recombinante y optimización de sus valores.\\
+	Garantizar sistema de expresión de proteína recombninante en cultivo bacteriano de \emph{E. coli}}
+	{}
+\vfill\null
+
+%---------------------------------------------------------------------------------------
+%	PUBLICATION
+%----------------------------------------------------------------------------------------
+
+\\
+\vspace{-0.5cm}
+\vfill\null
+\cvsection{PUBLICACIONES}
+
+\cvevent
+	{\textbf{}}
+	{Optimization for n-alkyl Cyanoacrylates Degradation by Human Cytochrome P450 2E1 Enzyme via Bioinformatic Methods}
+	{IFMBE proceedings (ISBN: 978-3-319-13117-7) Vol 49, 2015.}
+	{Status: Accepted and Published}
+	{}
+\vfill\null
+
+\cvevent
+	{\textbf{}}
+	{Composition of grain and forage is equivalent between corn hybrid (Zea mays L.) from genetically modified off-patent (event TC1507) and non-genetically modified conventional corn}
+	{Agronomía Colombiana (ISSN: 2357-3732)}
+	{Status: Under Review}
+	{}
+\vfill\null
+
+%---------------------------------------------------------------------------------------
+%	PROJECTS
+%----------------------------------------------------------------------------------------
+\vfill\null
+\cvsection{PROYECTOS}
+
+\cvevent
+	{\textbf{2020-Actual}}
+	{Laguna Negra Media}
+	{\href{https://www.lagunanegra.co}{www.lagunanegra.co}}
+	{Un medio digital de crítica cultural, ficciones, periodismo narrativo y escrituras creativas. Este proyecto ha contado con el reconocimiento de  IDARTES por medio del proceso formación MANADA-2021. Cuenta con una publicación semanal de nuevos contenidos en su web, así como la generación de contenidos para sus redes sociales.}
+\vfill\null
+
+\vfill\null
+\cvsection{VOLUNTARIADOS}
+
+\cvevent
+	{\textbf{2019}}
+	{Fundación Aroma Verde}
+	{Voluntario}
+	{Proyecto de enseñanza y generación de consciencia ambiental sobre los recursos botánicos del lugar en colegios de Puerto Inirida, Guainia.}
+\vfill\null
+
+\cvevent
+	{\textbf{2012-2016}}
+	{Fundación Aspirantes}
+	{Colaborador Biología}
+	{Proyecto de enseñanza comunitaria de temas de biología y química de temas básicos para la formación de personas de diversos lugares de la ciudad y recursos, con el fin de compartirles conocimientos y herramientas para que pudieran afrontar un examen de ingreso a la educación superior.}
+\vfill\null
+
+
+%---------------------------------------------------------------------------------------
+%	WORKSHOPS
+%----------------------------------------------------------------------------------------
+\vfill\null
+\cvsection{WORKSHOPS \& CONFERENCES}
+
+\cvevent
+	{\textbf{Nov 2019}}
+	{VII Simposio Colombiano de Biología Evolutiva}
+	{Universidad Pedagógica y Tecnológica de Colombia}
+	{Poster: Evaluación de modelos de tipo temporal como aproximación al entendimiento de las fuerzas de cambio evolutivo.}
+\vfill\null
+
+\cvevent
+	{\textbf{Jun 2017}}
+	{21st Swedish Conference on Macromolecular Structure and Function}
+	{}
+	{Poster: In silico design of a recombinant protein (CyDeg) with improved expression and solubility.}
+\vfill\null
+
+\cvevent
+	{\textbf{Dic 2015}}
+	{Simposio Trabajos de Grado 2015-II}
+	{Departamento de Biología, Universidad Nacional de Colombia}
+	{Ponente: Anatomía Floral del Género Aetanthus (Eichler) Engl. (Loranthaceae).}
+\vfill\null
+
+\cvevent
+	{\textbf{Oct 2014}}
+	{VI Congreso Latinoamericano de Ingeniería Biomédica CLAIB 2014}
+	{CLAIB 2014}
+	{Poster: Optimization for n-alkyl cyanoacrylates degradation by Human Cytochrome P450 2E1 Enzyme via bioinformatic methods.}
+\vfill\null
+
+\cvevent
+	{\textbf{Jun 2014}}
+	{Primer Congreso Colombiano de Bioquimica y Biologia Molecular}
+	{Universidad Nacional de Colombia}
+	{Poster: Análisis de interacciones proteína-ligando y optimización de las enzimas piruvato ferrodoxin oxidorreductasa y ferrodoxin hidrogenasa de la ruta de producción de hidrogeno por Clostridium W5.}
+\vfill\null
+
+
+%---------------------------------------------------------------------------------------
+%	SKILLS
+%----------------------------------------------------------------------------------------
+
+%---------------------------------------------------------------------------------------
+%	PERSONAL DETAILS
+%----------------------------------------------------------------------------------------
+\vfill\null
+\cvsection{EXTRACURRICULAR}
+\vspace{-0.3cm}
+\begin{itemize}
+  \item Jugador de Pokémon en formatos VGC y Smogon.
+  \item Entusiasta de la programación, aprendiendo nuevos lenguajes orientados a Data Science.
+  \item Lector de ciencia ficción, aventura y fantasía. Ahora con miniclub de lectura.
+\end{itemize}
+\vfill\null
+
+
+% hotfixes to create fake-space to ensure the whole height is used
+\vfill
+\vfill
+\vfill
+\end{rightcolumn}
+\end{paracol}
+\end{document}
+
